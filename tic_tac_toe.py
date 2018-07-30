@@ -59,13 +59,13 @@ class TicTacToe(Env):
         else:
             return self.board, -0.5, False, None
 
-    def render(self, mode="Human"):
-        shapes = {-1: 'o', 0: ' ', 1: 'x'}
-        print(f"{shapes[self.board[0,0]]}|{shapes[self.board[0,1]]}|{shapes[self.board[0,2]]}")
-        print('-+-+-')
-        print(f"{shapes[self.board[1,0]]}|{shapes[self.board[1,1]]}|{shapes[self.board[1,2]]}")
-        print('-+-+-')
-        print(f"{shapes[self.board[2,0]]}|{shapes[self.board[2,1]]}|{shapes[self.board[2,2]]}")
+    # def render(self, mode="Human"):
+    #     shapes = {-1: 'o', 0: ' ', 1: 'x'}
+    #     print(f"{shapes[self.board[0,0]]}|{shapes[self.board[0,1]]}|{shapes[self.board[0,2]]}")
+    #     print('-+-+-')
+    #     print(f"{shapes[self.board[1,0]]}|{shapes[self.board[1,1]]}|{shapes[self.board[1,2]]}")
+    #     print('-+-+-')
+    #     print(f"{shapes[self.board[2,0]]}|{shapes[self.board[2,1]]}|{shapes[self.board[2,2]]}")
 
 
     def try_make_turn(self, row, column):

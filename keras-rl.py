@@ -3,7 +3,7 @@ import argparse
 
 
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Flatten, Convolution2D, Permute
+from keras.layers import Dense, Activation, Flatten, Convolution2D
 from keras.optimizers import Adam
 from keras.callbacks import TensorBoard
 
@@ -22,23 +22,22 @@ parser.add_argument('--weights', type=str, default=None)
 args = parser.parse_args()
 
 # Get the environment and extract the number of actions.
-env = TicTacToe()
+from gym.wrappers import TimeLimit
+env = TimeLimit(TicTacToe(), max_episode_steps=10)
 nb_actions = env.action_space.n
 
 # Next, we build our model. We use the same model that was described by Mnih et al. (2015).
+WINDOW_LENGTH = 4
 input_shape = (3,3)
+input_shape = (WINDOW_LENGTH,) + input_shape
 
 def build_model():
     model = Sequential()
-    model.add(Convolution2D(16, 2, 2, input_shape=input_shape, padding="valid"))
-    model.add(Activation('relu'))
-    model.add(Convolution2D(32, 2, 2, input_shape=input_shape, padding="valid"))
-    model.add(Activation('relu'))
+    model.add(Convolution2D(16, kernel_size=(2, 2), input_shape=input_shape, padding="valid", activation='relu'))
+    model.add(Convolution2D(32, kernel_size=(2, 2), input_shape=input_shape, padding="valid", activation='relu'))
     model.add(Flatten())
-    model.add(Dense(32))
-    model.add(Activation('relu'))
-    model.add(Dense(32))
-    model.add(Activation('relu'))
+    model.add(Dense(32, activation='relu'))
+    model.add(Dense(32, activation='relu'))
     model.add(Dense(nb_actions))
     model.add(Activation('linear'))
     print(model.summary())
@@ -49,7 +48,7 @@ model = build_model()
 
 # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
 # even the metrics!
-memory = SequentialMemory(limit=1000000)
+memory = SequentialMemory(limit=1000000, window_length=WINDOW_LENGTH)
 
 # Select a policy. We use eps-greedy action selection, which means that a random action is selected
 # with probability eps. We anneal eps from 1.0 to 0.1 over the course of 1M steps. This is done so that
