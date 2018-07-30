@@ -43,6 +43,7 @@ class TicTacToe(Env):
         assert self.x_next
         row = action // 3
         column = action % 3
+        info = {}
 
         if self.try_make_turn(row,column):
             result = self.evaluate(self.board)
@@ -52,12 +53,12 @@ class TicTacToe(Env):
                 result = self.evaluate(self.board)
 
             if result is None:
-                return self.board, 0, False, None
+                return self.board, 0, False, {}
             else:
-                return self.board, result, True, None
+                return self.board, result, True, {}
 
         else:
-            return self.board, -0.5, False, None
+            return self.board, -0.5, False, {}
 
     # def render(self, mode="Human"):
     #     shapes = {-1: 'o', 0: ' ', 1: 'x'}

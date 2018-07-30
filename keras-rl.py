@@ -33,10 +33,9 @@ input_shape = (WINDOW_LENGTH,) + input_shape
 
 def build_model():
     model = Sequential()
-    model.add(Convolution2D(16, kernel_size=(2, 2), input_shape=input_shape, padding="valid", activation='relu'))
-    model.add(Convolution2D(32, kernel_size=(2, 2), input_shape=input_shape, padding="valid", activation='relu'))
-    model.add(Flatten())
-    model.add(Dense(32, activation='relu'))
+    model.add(Flatten(input_shape=input_shape))
+    model.add(Dense(128, activation='relu'))
+    model.add(Dense(128, activation='relu'))
     model.add(Dense(32, activation='relu'))
     model.add(Dense(nb_actions))
     model.add(Activation('linear'))
@@ -68,7 +67,9 @@ policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps', value_max=1., valu
 dqn = DQNAgent(model=model, nb_actions=nb_actions, policy=policy, memory=memory, nb_steps_warmup=50000, gamma=.99,
                target_model_update=10000,
                train_interval=4, delta_clip=1.)
-dqn.compile(Adam(lr=.00025), metrics=['mae'])
+dqn.compile(Adam(lr=.025), metrics=['mae'])
+
+print("about to enter the flags branching.")
 
 if args.mode == 'train':
     # Okay, now it's time to learn something! We capture the interrupt exception so that training
@@ -78,7 +79,7 @@ if args.mode == 'train':
     log_filename = 'dqn_{}_log.json'.format(args.env_name)
     callbacks = [ModelIntervalCheckpoint(checkpoint_weights_filename, interval=250000)]
     callbacks += [FileLogger(log_filename, interval=100)]
-    callbacks += [TensorBoard()] # requires 'requests' library
+    print("about to fit the dqn!")
     dqn.fit(env, callbacks=callbacks, nb_steps=1750000, log_interval=10000, verbose=2)
 
     # After training is done, we save the final weights one more time.
