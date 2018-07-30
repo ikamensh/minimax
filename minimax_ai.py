@@ -2,8 +2,7 @@ from math import inf as infinity
 from tic_tac_toe import TicTacToe
 from random_ai import RandomAI
 
-def game_over(state):
-    return TicTacToe.evaluate(state) is not None
+
 
 def empty_cells(state):
     results = []
@@ -14,16 +13,21 @@ def empty_cells(state):
 
     return results
 
+
+
+
 def minimax(state, depth, X_turn):
+    score = TicTacToe.evaluate(state)
+    game_over = score is not None
+
+    if depth == 0 or game_over:
+        return [-1, -1, score]
 
     if X_turn:
         best = [-1, -1, -infinity]
     else:
         best = [-1, -1, +infinity]
 
-    if depth == 0 or game_over(state):
-        score = TicTacToe.evaluate(state)
-        return [-1, -1, score]
 
     for cell in empty_cells(state):
         x, y = cell[0], cell[1]
@@ -52,7 +56,7 @@ class MinimaxAI:
         turns_possible = empty_cells(self.game.board)
         if len(turns_possible) == 1:
             row, column = turns_possible[0]
-        if len(turns_possible) == 9:
+        elif len(turns_possible) >= 7:
             row, column = self.random_ai.decide_turn()
         else:
             chosen_node = minimax(self.game.board, 10, self.game.x_next)

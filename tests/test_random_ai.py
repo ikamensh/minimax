@@ -3,9 +3,11 @@ from random_ai import RandomAI
 
 
 def test_makes_valid_turns():
-    game = TicTacToe(RandomAI())
+    game = TicTacToe()
 
-    row, column = game.o_ai.decide_turn(game.board)
+    game.o_ai = RandomAI(game)
+
+    row, column = game.o_ai.decide_turn()
 
     assert 0 <= row <= 2
     assert 0 <= column <= 2
