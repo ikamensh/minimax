@@ -1,31 +1,54 @@
 import numpy as np
 import random
 from functools import lru_cache
+from gym.core import Env
+from minimax_ai import MinimaxAI
+
+from gym import spaces
 
 
-class TicTacToe:
 
-    shapes = {-1:'o', 0:' ', 1: 'x'}
+class TicTacToe(Env):
 
     def __init__(self):
-        self.board = np.zeros([3,3])
+        self.board = np.zeros([3,3], dtype=np.int8)
         self.x_next = True if random.random() > 0.5 else False
-        self.o_ai = None
-        self.x_ai = None
+        self.o_ai = MinimaxAI(self)
+        self.action_space = spaces.Discrete(9)
+        self.observation_space = spaces.Box(low=-1, high=1, dtype=np.int8, shape=(3,3))
 
+
+    def reset(self):
+        self.board = np.zeros([3, 3])
+        self.x_next = True if random.random() > 0.5 else False
+        if not self.x_next:
+            row, column = self.o_ai.decide_turn()
+            assert self.try_make_turn(row, column)
+
+        return self.board
 
     def step(self, action):
+        """
+        :param action: a discrete action from 0 to 8. Cells are enumerated from left to right,
+        with columns continuing from top to bottom, like below:
+
+         0 | 1 | 2
+        -  + - + -
+         3 | 4 | 5
+        -  + - + -
+         6 | 7 | 8
+
+        :return: observation, reward, done?, None (info)
+        """
         assert self.x_next
-        row = action.row
-        column = action.column
+        row = action // 3
+        column = action % 3
 
         if self.try_make_turn(row,column):
             result = self.evaluate(self.board)
             if result is None:
-                self.x_next = False
-                row, column = self.o_ai.decide_turn(self.board)
+                row, column = self.o_ai.decide_turn()
                 assert self.try_make_turn(row, column)
-                self.x_next = True
                 result = self.evaluate(self.board)
 
             if result is None:
@@ -34,7 +57,16 @@ class TicTacToe:
                 return self.board, result, True, None
 
         else:
-            return self.board, -0.01, False, None
+            return self.board, -0.5, False, None
+
+    def render(self, mode="Human"):
+        shapes = {-1: 'o', 0: ' ', 1: 'x'}
+        print(f"{shapes[self.board[0,0]]}|{shapes[self.board[0,1]]}|{shapes[self.board[0,2]]}")
+        print('-+-+-')
+        print(f"{shapes[self.board[1,0]]}|{shapes[self.board[1,1]]}|{shapes[self.board[1,2]]}")
+        print('-+-+-')
+        print(f"{shapes[self.board[2,0]]}|{shapes[self.board[2,1]]}|{shapes[self.board[2,2]]}")
+
 
     def try_make_turn(self, row, column):
 
